@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -47,6 +48,7 @@ public class CriticServiceImpl implements CriticService {
     }
 
     @Override
+    @Transactional
     public CriticDTO update(CriticDTO criticDTO) throws NoSuchElementException {
         Critic critic = criticRepository.findById(criticDTO.getCriticId()).orElseThrow();
 
