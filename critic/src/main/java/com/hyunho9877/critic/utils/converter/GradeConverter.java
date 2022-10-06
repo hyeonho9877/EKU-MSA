@@ -1,6 +1,7 @@
 package com.hyunho9877.critic.utils.converter;
 
 import com.hyunho9877.critic.domain.Grade;
+
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
