@@ -3,6 +3,7 @@ package com.hyunho9877.critic.controller;
 import com.hyunho9877.critic.domain.Critic;
 import com.hyunho9877.critic.dto.CriticDTO;
 import com.hyunho9877.critic.service.interfaces.CriticService;
+import com.hyunho9877.critic.service.interfaces.KafkaService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +22,15 @@ import java.util.NoSuchElementException;
 public class CriticController {
 
     private final CriticService criticService;
+    private final KafkaService kafkaService;
 
     @PostMapping("/apply")
     public ResponseEntity<CriticDTO> applyCritic(@RequestBody CriticDTO criticDTO) {
+        String topic = "critic-lecture-topic";
         try {
-            return ResponseEntity.ok(criticService.apply(criticDTO));
+            CriticDTO applied = criticService.apply(criticDTO);
+            kafkaService.send(topic, applied);
+            return ResponseEntity.ok(applied);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(criticDTO);
         }
