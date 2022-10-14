@@ -3,6 +3,7 @@ package com.hyunho9877.infoboard.controller;
 import com.hyunho9877.infoboard.domain.InfoBoardComment;
 import com.hyunho9877.infoboard.dto.InfoBoardCommentDto;
 import com.hyunho9877.infoboard.service.interfaces.InfoBoardCommentService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.ResponseEntity;
@@ -52,11 +53,16 @@ public class InfoBoardCommentController {
     }
 
     @PostMapping("/recent")
+    @CircuitBreaker(name = "infoboard-commentRecentCircuitBreaker", fallbackMethod = "commentRecentFallBack")
     public ResponseEntity<List<InfoBoardComment>> recent(@RequestBody InfoBoardCommentDto dto) {
         try {
             return ResponseEntity.ok(commentService.recent(dto.getArticle()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
+    }
+
+    public ResponseEntity<List<InfoBoardComment>> commentRecentFallBack(@RequestBody InfoBoardCommentDto dto, Throwable throwable) {
+        return ResponseEntity.internalServerError().body(Collections.emptyList());
     }
 }
