@@ -2,7 +2,6 @@ package com.hyunho9877.freeboard.controller;
 
 import com.hyunho9877.freeboard.dto.FreeBoardDTO;
 import com.hyunho9877.freeboard.service.interfaces.FreeBoardService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +52,7 @@ public class FreeBoardController {
     }
 
     @PostMapping("/recent")
-    @CircuitBreaker(name = "freeBoardComment-recentCircuitBreaker", fallbackMethod = "commentRecentFallback")
+//    @CircuitBreaker(name = "freeBoardComment-recentCircuitBreaker", fallbackMethod = "commentRecentFallback")
     public ResponseEntity<?> recent(@RequestBody @Valid FreeBoardDTO dto) {
         try {
             return ResponseEntity.ok(boardService.recent(dto.getBuilding()));

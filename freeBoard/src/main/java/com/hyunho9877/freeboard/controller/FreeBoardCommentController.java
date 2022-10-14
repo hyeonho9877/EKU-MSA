@@ -2,7 +2,6 @@ package com.hyunho9877.freeboard.controller;
 
 import com.hyunho9877.freeboard.dto.FreeBoardCommentDTO;
 import com.hyunho9877.freeboard.service.interfaces.FreeBoardCommentService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +52,7 @@ public class FreeBoardCommentController {
     }
 
     @PostMapping("/recent")
-    @CircuitBreaker(name = "freeBoard-recentCircuitBreaker", fallbackMethod = "boardRecentFallback")
+//    @CircuitBreaker(name = "freeBoard-recentCircuitBreaker", fallbackMethod = "boardRecentFallback")
     public ResponseEntity<?> recent(@RequestBody @Valid FreeBoardCommentDTO dto) {
         try {
             return ResponseEntity.ok(commentService.recent(dto.getArticleID()));

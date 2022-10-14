@@ -10,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor @AllArgsConstructor
 public class FreeBoardComment extends BaseTime{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String writer;
     private String comment;

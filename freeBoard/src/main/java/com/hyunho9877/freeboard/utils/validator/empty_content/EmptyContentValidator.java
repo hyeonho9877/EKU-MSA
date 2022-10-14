@@ -8,7 +8,6 @@ import java.util.Arrays;
 public class EmptyContentValidator {
     public static void validate(String... values) throws IllegalArgumentException{
         boolean match = Arrays.stream(values)
-                .peek(s->log.info("peek : {}", s))
                 .anyMatch(s -> (s == null || s.equals("") || s.equals("\n") || s.equals("\t") || s.equals(" ")));
         if(match) throw new IllegalArgumentException("DTO contains invalid character like '\n', '\t' blank, empty string or null");
     }
