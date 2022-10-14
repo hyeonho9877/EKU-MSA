@@ -1,11 +1,12 @@
 package com.hyunho9877.infoboard.dto;
 
 import com.hyunho9877.infoboard.utils.validator.number_only.NumberFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import javax.persistence.PrePersist;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor @NoArgsConstructor
 public class InfoBoardDto {
     private Long id;
     @NumberFormat

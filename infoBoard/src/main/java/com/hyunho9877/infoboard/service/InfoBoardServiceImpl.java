@@ -4,8 +4,6 @@ import com.hyunho9877.infoboard.domain.InfoBoard;
 import com.hyunho9877.infoboard.dto.InfoBoardDto;
 import com.hyunho9877.infoboard.repository.InfoBoardRepository;
 import com.hyunho9877.infoboard.service.interfaces.InfoBoardService;
-import com.hyunho9877.infoboard.utils.validator.empty_content.EmptyContentValidator;
-import com.hyunho9877.infoboard.utils.validator.number_only.NumberFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +21,8 @@ public class InfoBoardServiceImpl implements InfoBoardService {
 
     @Override
     public List<InfoBoard> recent(String building) {
-        return null;
+        validate(building);
+        return boardRepository.findByBuilding(building);
     }
 
     @Override

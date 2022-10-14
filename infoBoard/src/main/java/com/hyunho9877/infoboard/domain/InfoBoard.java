@@ -1,5 +1,6 @@
 package com.hyunho9877.infoboard.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,7 +17,8 @@ public class InfoBoard extends BaseTime {
     private String building;
     private String content;
     private long comments;
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL) @ToString.Exclude
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    @JsonIgnore @ToString.Exclude
     private List<InfoBoardComment> commentList;
 
     @PrePersist
