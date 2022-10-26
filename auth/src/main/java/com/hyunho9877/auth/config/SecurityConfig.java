@@ -16,7 +16,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests(request ->
                         request
-                                .antMatchers("/api/v1/accounts/registration").permitAll()
+                                .antMatchers("/api/v1/accounts/registration", "/actuator/**").permitAll()
                                 .anyRequest().authenticated());
         return http.build();
     }

@@ -44,13 +44,16 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:19.0.3
+    networks:
+      - eku
     ports:
-      - "8073:8080"
+      - "8073:8073"
     deploy:
       resources:
         limits:
           memory: 700m
     environment:
+      KC_HTTP_PORT: 8073
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     command:
@@ -72,8 +75,10 @@ services:
     environment:
       SERVER_PORT: 8071
       SPRING_PROFILES_ACTIVE: git
-      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/hyeonho9877/EKU-config.git
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/hyeonho9877/EKU-config
+      SPRING_CLOUD_CONFIG_SERVER_GIT_CLONE-ON-START: true
       SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT-LABEL: main
+      SPRING_CLOUD_CONFIG_SERVER_GIT_SKIP-SSL-VALIDATION: true
       ENCRYPT_KEY: ddldddtkqslkxhddogkcrgnriklkurfqlstdsndqdkqnlrsdelrmfsdgdgkrdlwlsfhlnkdssjstmfqrrnalqfmsfwniksrPoruodgfrvdjtlkkhsldlnhghkavkceeiorkr
       SPRING_SLEUTH_SAMPLER_PROBABILITY: 1
       SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
@@ -252,6 +257,8 @@ services:
 
   gateway:
     image: ruldarm00/eku-gateway
+    ports:
+      - "8074:8080"
     deploy:
       resources:
         limits:
