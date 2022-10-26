@@ -219,6 +219,7 @@ services:
         max_attempts: 3
         window: 120s
     depends_on:
+      - configserver
       - eurekaserver
       - freeboard-repository
     environment:
@@ -226,7 +227,49 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
 
+  account:
+    image: ruldarm00/eku-account
+    ports:
+      - "8084:8080"
+    networks:
+      - eku
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+      restart_policy:
+        condition: on-failure
+        delay: 45s
+        max_attempts: 3
+        window: 120s
+    depends_on:
+      - configserver
+      - eurekaserver
+    environment:
+      SPRING_APPLICATION_NAME: account
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
 
+  gateway:
+    image: ruldarm00/eku-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        window: 120s
+        max_attempts: 3
+    networks:
+      - eku
+    depends_on:
+      - freeboard
+      - account
+    environment:
+      SPRING_APPLICATION_NAME: gateway
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
 
 networks:
   eku:
