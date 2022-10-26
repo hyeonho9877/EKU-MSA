@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeExchange(exchanges ->
                         exchanges
-                                .pathMatchers("/actuator/**", "/hello").permitAll()
+                                .pathMatchers("/actuator/**").permitAll()
                                 .anyExchange().authenticated())
                 .oauth2Login(Customizer.withDefaults());
         return http.build();

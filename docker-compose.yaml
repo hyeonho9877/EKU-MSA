@@ -99,7 +99,6 @@ services:
       SPRING_APPLICATION_NAME: eurekaserver
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
-      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
 #  critic-repository:
 #    image: mysql:8.0.29
@@ -140,9 +139,8 @@ services:
 #      - critic-repository
 #    environment:
 #      SPRING_APPLICATION_NAME: critic
-#      SPRING_PROFILES_ACTIVE: dev
+#      SPRING_PROFILES_ACTIVE: default
 #      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
-#      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 #
 #  doodle-repository:
 #    image: mysql:8.0.29
@@ -185,114 +183,50 @@ services:
 #      SPRING_APPLICATION_NAME: doodle
 #      SPRING_PROFILES_ACTIVE: dev
 #      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
-#      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
-#  freeboard-repository:
-#    image: mysql:8.0.29
-#    ports:
-#      - "3309:3309"
-#    networks:
-#      - eku
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 700m
-#    environment:
-#      MYSQL_ROOT_PASSWORD: "inthegardenofsinners"
-#      MYSQL_DATABASE: freeboard
-#      MYSQL_USER: freeboard
-#      MYSQL_PASSWORD: freeboardPassword1234
-#      MYSQL_TCP_PORT: 3309
-#    volumes:
-#      - /etc/docker/freeboard/mysql/data:/var/lib/mysql
-
-#  freeboard:
-#    image: ruldarm00/eku-freeboard
-#    ports:
-#      - "8082:8080"
-#    networks:
-#      - eku
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 700m
-#      restart_policy:
-#        condition: on-failure
-#        delay: 30s
-#        max_attempts: 3
-#        window: 120s
-#    depends_on:
-#      - eurekaserver
-#      - freeboard-repository
-#    environment:
-#      SPRING_APPLICATION_NAME: freeboard
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
-#      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
-
-#  infoboard-repository:
-#    image: mysql:8.0.29
-#    ports:
-#      - "3310:3310"
-#    networks:
-#      - eku
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 700m
-#    environment:
-#      MYSQL_ROOT_PASSWORD: "inthegardenofsinners"
-#      MYSQL_DATABASE: infoboard
-#      MYSQL_USER: infoboard
-#      MYSQL_PASSWORD: infoboardPassword1234
-#      MYSQL_TCP_PORT: 3310
-#    volumes:
-#      - /etc/docker/infoboard/mysql/data:/var/lib/mysql
-#
-#  infoboard:
-#    image: ruldarm00/eku-infoboard
-#    ports:
-#      - "8083:8080"
-#    networks:
-#      - eku
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 700m
-#      restart_policy:
-#        condition: on-failure
-#        delay: 30s
-#        max_attempts: 3
-#        window: 120s
-#    depends_on:
-#      - eurekaserver
-#      - infoboard-repository
-#    environment:
-#      SPRING_APPLICATION_NAME: infoboard
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
-#      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
-  gateway:
-    image: ruldarm00/eku-gateway
+  freeboard-repository:
+    image: mysql:8.0.29
     ports:
-      - "8074:8074"
+      - "3309:3309"
+    networks:
+      - eku
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      MYSQL_ROOT_PASSWORD: "inthegardenofsinners"
+      MYSQL_DATABASE: freeboard
+      MYSQL_USER: freeboard
+      MYSQL_PASSWORD: freeboardPassword1234
+      MYSQL_TCP_PORT: 3309
+    volumes:
+      - /etc/docker/freeboard/mysql/data:/var/lib/mysql
+
+  freeboard:
+    image: ruldarm00/eku-freeboard
+    ports:
+      - "8082:8080"
+    networks:
+      - eku
     deploy:
       resources:
         limits:
           memory: 700m
       restart_policy:
         condition: on-failure
+        delay: 30s
         max_attempts: 3
         window: 120s
-        delay: 45s
     depends_on:
-      - freeboard
-    networks:
-      - eku
+      - eurekaserver
+      - freeboard-repository
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
-      SPRING_APPLICATION_NAME: gateway
+      SPRING_APPLICATION_NAME: freeboard
       SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+
+
 
 networks:
   eku:
