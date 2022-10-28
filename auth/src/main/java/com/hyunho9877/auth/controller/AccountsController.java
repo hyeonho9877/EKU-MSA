@@ -34,10 +34,10 @@ public class AccountsController {
 
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(Authentication authentication) {
-        String userId = authentication.getName();
-        log.info("delete user id : {}", userId);
-        accountService.withdraw(userId);
-        kafkaService.send(userId, EnumSet.allOf(KafkaTopics.class));
-        return ResponseEntity.ok(userId);
+        String username = authentication.getName();
+        log.info("delete username : {}", username);
+        accountService.withdraw(username);
+        kafkaService.send(username, EnumSet.allOf(KafkaTopics.class));
+        return ResponseEntity.ok(username);
     }
 }
