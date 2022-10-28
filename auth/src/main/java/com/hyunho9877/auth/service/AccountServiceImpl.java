@@ -8,9 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 
 @Slf4j
@@ -32,5 +29,10 @@ public class AccountServiceImpl implements AccountService {
                 .build();
 
         feignClient.registerUser(userRepresentation);
+    }
+
+    @Override
+    public void withdraw(String id) {
+        feignClient.withdraw(id);
     }
 }
