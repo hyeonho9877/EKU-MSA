@@ -10,11 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
 
 @Slf4j
 @RestController
@@ -64,23 +61,7 @@ public class FreeBoardController {
         }
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello";
-    }
-
-    public ResponseEntity<?> commentRecentFallback(@RequestBody @Valid FreeBoardDTO dto, Throwable throwable) {
+    public ResponseEntity<?> commentRecentFallback(String building, Throwable throwable) {
         return ResponseEntity.internalServerError().body(Collections.emptyList());
-    }
-
-    @GetMapping("/callback")
-    public void oauthCallBack(HttpServletRequest request) {
-        Enumeration<String> headerNames = request.getHeaderNames();
-        Iterator<String> headerIterator = headerNames.asIterator();
-        while (headerIterator.hasNext()) {
-            String header = headerIterator.next();
-            String headerContent = request.getHeader(header);
-            log.info("{} : {}", header, headerContent);
-        }
     }
 }

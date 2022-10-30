@@ -20,6 +20,7 @@ public class KafkaConsumer {
 
     @KafkaListener(topics = kafkaTopic, groupId = groupId)
     public void updateDeletedUserArticle(@Payload String username) {
+        log.info("kafka message : {}", username);
         boardRepository.deleteByWriter(username);
         commentRepository.deleteByWriter(username);
     }
