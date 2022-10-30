@@ -39,6 +39,7 @@ public class FreeBoardCommentServiceImpl implements FreeBoardCommentService {
                 .writer(dto.getWriter())
                 .comment(dto.getComment())
                 .article(board)
+                .disabled(false)
                 .build();
         FreeBoardComment comment = commentRepository.save(build);
         board.setComments(board.getComments()+1);
