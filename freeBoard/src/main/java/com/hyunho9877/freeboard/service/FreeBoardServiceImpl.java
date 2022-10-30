@@ -32,6 +32,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
                 .content(dto.getContent())
                 .writer(dto.getWriter())
                 .building(dto.getBuilding())
+                .disabled(false)
                 .build();
         boardRepository.save(board);
         return dto;

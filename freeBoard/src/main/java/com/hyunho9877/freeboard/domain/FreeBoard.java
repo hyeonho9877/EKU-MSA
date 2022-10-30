@@ -2,6 +2,8 @@ package com.hyunho9877.freeboard.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.List;
 @Entity
 @Getter @Setter @ToString @Builder
 @NoArgsConstructor @AllArgsConstructor
+@SQLDelete(sql = "update free_board set disabled=true where id = ?")
+@Where(clause = "disabled=false")
 public class FreeBoard extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +24,7 @@ public class FreeBoard extends BaseTime {
     private Integer comments;
     @Column(nullable = false)
     private String building;
+    private boolean disabled;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "article")
     @JsonIgnore
