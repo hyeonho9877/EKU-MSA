@@ -23,6 +23,7 @@ public class FreeBoard extends BaseTime {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "article")
     @JsonIgnore
+    @ToString.Exclude
     private List<FreeBoardComment> commentList;
 
     @PrePersist

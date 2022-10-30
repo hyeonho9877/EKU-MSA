@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface FreeBoardCommentRepository extends JpaRepository<FreeBoardComment, Long> {
     List<FreeBoardComment> findByArticleOrderByIdDesc(FreeBoard article);
+
+    void deleteByWriter(String username);
 }

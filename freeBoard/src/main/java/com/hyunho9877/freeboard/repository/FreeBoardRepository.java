@@ -11,4 +11,6 @@ public interface FreeBoardRepository extends JpaRepository<FreeBoard, Long> {
 
     @Query(value = "select f from FreeBoard f join fetch f.commentList c where f.id = :articleID")
     FreeBoard getArticleWithComments(Long articleID);
+
+    void deleteByWriter(String writer);
 }
