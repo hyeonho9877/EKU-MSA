@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +35,12 @@ public class AccountsController {
 
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(Authentication authentication) {
-        String username = authentication.getName();
-        log.info("delete username : {}", username);
-        accountService.withdraw(username);
+        String userId = authentication.getName();
+        Jwt principal = (Jwt) authentication.getPrincipal();
+        String username = principal.getClaimAsString("preferred_username");
+        log.info("delete userId : {}", userId);
+        accountService.withdraw(userId);
         kafkaService.send(username, EnumSet.allOf(KafkaTopics.class));
-        return ResponseEntity.ok(username);
+        return ResponseEntity.ok(userId);
     }
 }
