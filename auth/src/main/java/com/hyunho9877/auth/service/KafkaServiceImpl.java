@@ -20,9 +20,7 @@ public class KafkaServiceImpl implements KafkaService {
 
     @Override
     public void send(String username, EnumSet<KafkaTopics> topics) {
-        log.info("user id : {}", username);
         topics.forEach(topic -> {
-            log.info("topic : {}", topic.getTopicName());
              kafkaTemplate.send(topic.getTopicName(), "username", username);
         });
     }
