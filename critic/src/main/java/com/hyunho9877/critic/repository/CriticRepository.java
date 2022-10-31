@@ -9,4 +9,5 @@ import java.util.List;
 public interface CriticRepository extends JpaRepository<Critic, Long> {
     List<Critic> findByOrderByCriticIdDesc(Pageable pageable);
     List<Critic> findByLectureNameAndLectureProfessor(String lectureName, String lectureProfessor);
+    void deleteByWriter(String writer);
 }

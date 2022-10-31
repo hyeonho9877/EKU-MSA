@@ -23,7 +23,7 @@ public class Critic {
     @Column(nullable = false)
     private Float star;
     @Column(nullable = false)
-    private Long writer;
+    private String writer;
     @Column(nullable = false)
     private String lectureName;
     @Column(nullable = false)
