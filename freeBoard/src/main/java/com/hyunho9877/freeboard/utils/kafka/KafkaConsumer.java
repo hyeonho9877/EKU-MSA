@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class KafkaConsumer {
 
-    private final String kafkaTopic = "account-freeboard-topic";
+    private final String kafkaTopic = "user-withdraw";
     private final String groupId = "freeboard";
     private final FreeBoardRepository boardRepository;
     private final FreeBoardCommentRepository commentRepository;

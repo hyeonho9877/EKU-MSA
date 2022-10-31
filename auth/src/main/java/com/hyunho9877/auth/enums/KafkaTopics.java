@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum KafkaTopics {
 
-    FREEBOARD("account-freeboard-topic"),
-    INFOBOARD("account-infoboard-topic"),
-    DOODLE("account-doodle-topic");
+    WITHDRAW("user-withdraw");
 
     private final String topicName;
 }
