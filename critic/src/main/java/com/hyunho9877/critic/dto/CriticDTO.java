@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class CriticDTO {
     private Long criticId;
-    private Long writer;
+    private String writer;
     private String content="";
     private Grade grade;
     private Float star;
