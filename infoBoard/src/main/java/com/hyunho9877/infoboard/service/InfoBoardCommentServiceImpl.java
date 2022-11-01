@@ -6,6 +6,7 @@ import com.hyunho9877.infoboard.dto.InfoBoardCommentDto;
 import com.hyunho9877.infoboard.repository.InfoBoardCommentRepository;
 import com.hyunho9877.infoboard.repository.InfoBoardRepository;
 import com.hyunho9877.infoboard.service.interfaces.InfoBoardCommentService;
+import com.hyunho9877.infoboard.utils.common.WriterGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class InfoBoardCommentServiceImpl implements InfoBoardCommentService {
 
     private final InfoBoardCommentRepository commentRepository;
     private final InfoBoardRepository boardRepository;
+    private final WriterGenerator writerGenerator;
 
     @Override
     public List<InfoBoardComment> recent(Long articleId) {
@@ -28,14 +30,14 @@ public class InfoBoardCommentServiceImpl implements InfoBoardCommentService {
     }
 
     @Override
-    public void apply(InfoBoardCommentDto dto) {
-        validate(dto.getWriter(), dto.getComment());
+    public void apply(InfoBoardCommentDto dto, String studNo, String name) {
+        validate(dto.comment());
 
-        InfoBoard article = boardRepository.findById(dto.getArticle()).orElseThrow();
+        InfoBoard article = boardRepository.findById(dto.article()).orElseThrow();
 
         InfoBoardComment comment = InfoBoardComment.builder()
-                .writer(dto.getWriter())
-                .comment(dto.getComment())
+                .writer(writerGenerator.generate(studNo, name))
+                .comment(dto.comment())
                 .article(article)
                 .build();
 
@@ -46,16 +48,15 @@ public class InfoBoardCommentServiceImpl implements InfoBoardCommentService {
 
     @Override
     public void delete(InfoBoardCommentDto dto) {
-        validate(dto.getWriter());
-        InfoBoard article = boardRepository.findById(dto.getArticle()).orElseThrow();
-        commentRepository.deleteById(dto.getId());
+        InfoBoard article = boardRepository.findById(dto.article()).orElseThrow();
+        commentRepository.deleteById(dto.id());
         article.setComments(article.getComments() - 1);
     }
 
     @Override
     public void update(InfoBoardCommentDto dto) {
-        validate(dto.getComment(), dto.getWriter());
-        InfoBoardComment comment = commentRepository.findById(dto.getId()).orElseThrow();
-        comment.setComment(dto.getComment());
+        validate(dto.comment());
+        InfoBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        comment.setComment(dto.comment());
     }
 }
