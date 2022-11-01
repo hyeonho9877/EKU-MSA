@@ -30,7 +30,7 @@ public class InfoBoardCommentController {
     public ResponseEntity<InfoBoardCommentDto> apply(@RequestBody InfoBoardCommentDto dto, Authentication authentication) {
         try {
             Jwt jwt = (Jwt) authentication.getPrincipal();
-            commentService.apply(dto, jwtExtractor.getStudNo(jwt), jwtExtractor.getName(jwt));
+            commentService.apply(dto, jwtExtractor.getStudNo(jwt), jwtExtractor.getDepartment(jwt));
             return ResponseEntity.ok(dto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
