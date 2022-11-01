@@ -22,14 +22,11 @@ import java.util.NoSuchElementException;
 public class CriticController {
 
     private final CriticService criticService;
-    private final KafkaService kafkaService;
 
     @PostMapping("/apply")
     public ResponseEntity<CriticDTO> applyCritic(@RequestBody CriticDTO criticDTO) {
-        String topic = "critic-lecture-topic";
         try {
             CriticDTO applied = criticService.apply(criticDTO);
-            kafkaService.send(topic, applied);
             return ResponseEntity.ok(applied);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(criticDTO);
