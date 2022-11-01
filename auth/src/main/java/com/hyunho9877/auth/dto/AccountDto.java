@@ -1,12 +1,5 @@
 package com.hyunho9877.auth.dto;
 
-import lombok.Data;
+public record AccountDto(String username, String firstName, String lastName, String email, String password) {
 
-@Data
-public class AccountDto {
-    private String userId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
 }

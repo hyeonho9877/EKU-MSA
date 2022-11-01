@@ -28,7 +28,6 @@ public class AccountsController {
 
     @PostMapping("/registration")
     public ResponseEntity<AccountDto> registration(@RequestBody AccountDto dto) {
-        log.info("dto : {}", dto);
         accountService.register(dto);
         return ResponseEntity.ok(dto);
     }
@@ -38,7 +37,6 @@ public class AccountsController {
         String userId = authentication.getName();
         Jwt principal = (Jwt) authentication.getPrincipal();
         String username = principal.getClaimAsString("preferred_username");
-        log.info("delete userId : {}", userId);
         accountService.withdraw(userId);
         kafkaService.send(username, EnumSet.allOf(KafkaTopics.class));
         return ResponseEntity.ok(userId);

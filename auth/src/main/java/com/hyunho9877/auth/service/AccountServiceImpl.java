@@ -20,12 +20,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void register(AccountDto dto) {
         KeyCloakUserDto userRepresentation = KeyCloakUserDto.builder()
-                .username(dto.getUserId())
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .email(dto.getEmail())
+                .username(dto.username())
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
+                .email(dto.email())
                 .enabled(true)
-                .credentials(List.of(new KeyCloakUserDto.CredentialsDto(dto.getPassword(), false)))
+                .credentials(List.of(new KeyCloakUserDto.CredentialsDto(dto.password(), false)))
                 .build();
 
         feignClient.registerUser(userRepresentation);
