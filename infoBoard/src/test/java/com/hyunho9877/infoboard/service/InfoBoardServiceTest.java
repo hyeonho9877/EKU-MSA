@@ -23,7 +23,7 @@ class InfoBoardServiceTest {
     @Test
     @DirtiesContext
     void apply_basic() {
-        InfoBoardDto dto = new InfoBoardDto(null, "00010", "test apply", 0L);
+        InfoBoardDto dto = new InfoBoardDto(null, "00010", "test apply", 0L, null);
         boardService.apply(dto, "201713883", "신현호");
         assertEquals(19, boardRepository.findAll().size());
     }
@@ -37,13 +37,13 @@ class InfoBoardServiceTest {
 
     @Test
     void apply_no_building() {
-        InfoBoardDto dto = new InfoBoardDto(null, null, "test apply", 0L);
+        InfoBoardDto dto = new InfoBoardDto(null, null, "test apply", 0L, null);
         assertThrows(IllegalArgumentException.class, () -> boardService.apply(dto, "201713883", "신현호"));
     }
 
     @Test
     void apply_no_content() {
-        InfoBoardDto dto = new InfoBoardDto(null, "00010", null, 0L);
+        InfoBoardDto dto = new InfoBoardDto(null, "00010", null, 0L, null);
         assertThrows(IllegalArgumentException.class, () -> boardService.apply(dto, "201713883", "신현호"));
     }
 
@@ -56,28 +56,28 @@ class InfoBoardServiceTest {
 
     @Test
     void apply_empty_building() {
-        InfoBoardDto dto = new InfoBoardDto(null, "", "test apply", 0L);
+        InfoBoardDto dto = new InfoBoardDto(null, "", "test apply", 0L, null);
         assertThrows(IllegalArgumentException.class, () -> boardService.apply(dto, "201713883", "신현호"));
     }
 
     @Test
     void apply_empty_content() {
-        InfoBoardDto dto = new InfoBoardDto(null, "00010", "", 0L);
+        InfoBoardDto dto = new InfoBoardDto(null, "00010", "", 0L, null);
         assertThrows(IllegalArgumentException.class, () -> boardService.apply(dto, "201713883", "신현호"));
     }
 
     @Test
     @DirtiesContext
     void delete_basic() {
-        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", null, 0L);
-        boardService.delete(dto);
+        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", null, 0L, null);
+        boardService.delete(dto, "201521352");
         assertFalse(boardRepository.findById(10001L).isPresent());
     }
 
     @Test
     void delete_no_id() {
-        InfoBoardDto dto = new InfoBoardDto(null, "00010", null, 0L);
-        assertThrows(InvalidDataAccessApiUsageException.class, () -> boardService.delete(dto));
+        InfoBoardDto dto = new InfoBoardDto(null, "00010", null, 0L, null);
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> boardService.delete(dto ,"201521352"));
     }
 
     @Test
@@ -89,8 +89,8 @@ class InfoBoardServiceTest {
 
     @Test
     void delete_no_building() {
-        InfoBoardDto dto = new InfoBoardDto(10001L, null, null, 0L);
-        assertThrows(IllegalArgumentException.class, () -> boardService.delete(dto));
+        InfoBoardDto dto = new InfoBoardDto(10001L, null, null, 0L, null);
+        assertThrows(IllegalArgumentException.class, () -> boardService.delete(dto, "201521352"));
     }
 
     @Test
@@ -102,16 +102,16 @@ class InfoBoardServiceTest {
 
     @Test
     void delete_empty_building() {
-        InfoBoardDto dto = new InfoBoardDto(10001L, "", null, 0L);
-        assertThrows(IllegalArgumentException.class, () -> boardService.delete(dto));
+        InfoBoardDto dto = new InfoBoardDto(10001L, "", null, 0L, null);
+        assertThrows(IllegalArgumentException.class, () -> boardService.delete(dto, "201521352"));
     }
 
     @Test
     @DirtiesContext
     void update_basic() {
         String updated = "updated";
-        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", updated, 0L);
-        boardService.update(dto);
+        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", updated, 0L, null);
+        boardService.update(dto, "201521352");
 
         InfoBoard article = boardRepository.findById(10001L).orElseThrow();
         assertEquals(updated, article.getContent());
@@ -120,8 +120,8 @@ class InfoBoardServiceTest {
     @Test
     void update_no_id() {
         String updated = "updated";
-        InfoBoardDto dto = new InfoBoardDto(null, "00010", updated, 0L);
-        assertThrows(InvalidDataAccessApiUsageException.class, () -> boardService.update(dto));
+        InfoBoardDto dto = new InfoBoardDto(null, "00010", updated, 0L, null);
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> boardService.update(dto, "201521352"));
     }
 
     @Test
@@ -135,15 +135,15 @@ class InfoBoardServiceTest {
     @Test
     void update_no_building() {
         String updated = "updated";
-        InfoBoardDto dto = new InfoBoardDto(10001L, null, updated, 0L);
-        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto));
+        InfoBoardDto dto = new InfoBoardDto(10001L, null, updated, 0L,null);
+        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto, "201521352"));
     }
 
     @Test
     void update_no_content() {
         String updated = "updated";
-        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", null, 0L);
-        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto));
+        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", null, 0L, null);
+        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto, "201521352"));
     }
 
     @Test
@@ -157,15 +157,15 @@ class InfoBoardServiceTest {
     @Test
     void update_empty_building() {
         String updated = "updated";
-        InfoBoardDto dto = new InfoBoardDto(10001L, "", updated, 0L);
-        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto));
+        InfoBoardDto dto = new InfoBoardDto(10001L, "", updated, 0L, null);
+        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto, "201521352"));
     }
 
     @Test
     void update_empty_content() {
         String updated = "updated";
-        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", "", 0L);
-        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto));
+        InfoBoardDto dto = new InfoBoardDto(10001L, "00010", "", 0L, null);
+        assertThrows(IllegalArgumentException.class, () -> boardService.update(dto, "201521352"));
     }
 
     @Test

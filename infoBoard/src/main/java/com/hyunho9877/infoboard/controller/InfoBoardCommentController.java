@@ -38,9 +38,10 @@ public class InfoBoardCommentController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<InfoBoardCommentDto> delete(@RequestBody InfoBoardCommentDto dto) {
+    public ResponseEntity<InfoBoardCommentDto> delete(@RequestBody InfoBoardCommentDto dto, Authentication authentication) {
         try {
-            commentService.delete(dto);
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            commentService.delete(dto, jwtExtractor.getStudNo(jwt));
             return ResponseEntity.ok(dto);
         } catch (InvalidDataAccessApiUsageException e) {
             return ResponseEntity.badRequest().body(dto);
@@ -48,9 +49,10 @@ public class InfoBoardCommentController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<InfoBoardCommentDto> update(@RequestBody InfoBoardCommentDto dto) {
+    public ResponseEntity<InfoBoardCommentDto> update(@RequestBody InfoBoardCommentDto dto, Authentication authentication) {
         try {
-            commentService.update(dto);
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            commentService.update(dto, jwtExtractor.getStudNo(jwt));
             return ResponseEntity.ok(dto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
@@ -59,7 +61,7 @@ public class InfoBoardCommentController {
 
     @PostMapping("/recent")
     @CircuitBreaker(name = "infoboard-commentRecentCircuitBreaker", fallbackMethod = "commentRecentFallBack")
-    public ResponseEntity<List<InfoBoardComment>> recent(@RequestBody InfoBoardCommentDto dto) {
+    public ResponseEntity<List<InfoBoardCommentDto>> recent(@RequestBody InfoBoardCommentDto dto) {
         try {
             return ResponseEntity.ok(commentService.recent(dto.article()));
         } catch (IllegalArgumentException e) {

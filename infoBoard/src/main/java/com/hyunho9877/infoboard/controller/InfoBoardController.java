@@ -40,9 +40,10 @@ public class InfoBoardController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<InfoBoardDto> delete(@RequestBody InfoBoardDto dto) {
+    public ResponseEntity<InfoBoardDto> delete(@RequestBody InfoBoardDto dto, Authentication authentication) {
         try {
-            boardService.delete(dto);
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            boardService.delete(dto, jwtExtractor.getStudNo(jwt));
             return ResponseEntity.ok(dto);
         } catch (InvalidDataAccessApiUsageException e) {
             return ResponseEntity.badRequest().body(dto);
@@ -51,9 +52,10 @@ public class InfoBoardController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody InfoBoardDto dto) {
+    public ResponseEntity<?> update(@RequestBody InfoBoardDto dto, Authentication authentication) {
         try {
-            boardService.update(dto);
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            boardService.update(dto, jwtExtractor.getStudNo(jwt));
             return ResponseEntity.ok(dto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
@@ -62,7 +64,7 @@ public class InfoBoardController {
 
     @PostMapping("/recent")
     @CircuitBreaker(name = "infoboard-boardRecentCircuitBreaker", fallbackMethod = "boardRecentFallBack")
-    public ResponseEntity<List<InfoBoard>> recent(@RequestBody InfoBoardDto dto) {
+    public ResponseEntity<List<InfoBoardDto>> recent(@RequestBody InfoBoardDto dto) {
         try {
             return ResponseEntity.ok(boardService.recent(dto.building()));
         } catch (IllegalArgumentException e) {

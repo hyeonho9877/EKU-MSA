@@ -25,18 +25,21 @@ public class InfoBoardCommentServiceImpl implements InfoBoardCommentService {
     private final WriterGenerator writerGenerator;
 
     @Override
-    public List<InfoBoardComment> recent(Long articleId) {
-        return commentRepository.findByArticle_Id(articleId);
+    public List<InfoBoardCommentDto> recent(Long articleId) {
+        return commentRepository.findByArticle_Id(articleId).stream()
+                .map(comment -> new InfoBoardCommentDto(comment.getId(), comment.getComment(), null, writerGenerator.generate(comment.getWriter(), comment.getDept())))
+                .toList();
     }
 
     @Override
-    public void apply(InfoBoardCommentDto dto, String studNo, String name) {
+    public void apply(InfoBoardCommentDto dto, String studNo, String dept) {
         validate(dto.comment());
 
         InfoBoard article = boardRepository.findById(dto.article()).orElseThrow();
 
         InfoBoardComment comment = InfoBoardComment.builder()
-                .writer(writerGenerator.generate(studNo, name))
+                .writer(studNo)
+                .dept(dept)
                 .comment(dto.comment())
                 .article(article)
                 .build();
@@ -47,16 +50,21 @@ public class InfoBoardCommentServiceImpl implements InfoBoardCommentService {
     }
 
     @Override
-    public void delete(InfoBoardCommentDto dto) {
+    public void delete(InfoBoardCommentDto dto, String writer) {
         InfoBoard article = boardRepository.findById(dto.article()).orElseThrow();
-        commentRepository.deleteById(dto.id());
+        InfoBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        if(!comment.getWriter().equals(writer))
+            throw new IllegalStateException("user trying to delete comment which is not written by user");
+        commentRepository.delete(comment);
         article.setComments(article.getComments() - 1);
     }
 
     @Override
-    public void update(InfoBoardCommentDto dto) {
+    public void update(InfoBoardCommentDto dto, String writer) {
         validate(dto.comment());
         InfoBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        if(!comment.getWriter().equals(writer))
+            throw new IllegalStateException("user trying to delete article which is not written by user");
         comment.setComment(dto.comment());
     }
 }
