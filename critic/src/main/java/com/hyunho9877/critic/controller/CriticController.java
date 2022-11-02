@@ -3,11 +3,16 @@ package com.hyunho9877.critic.controller;
 import com.hyunho9877.critic.domain.Critic;
 import com.hyunho9877.critic.dto.CriticDTO;
 import com.hyunho9877.critic.service.interfaces.CriticService;
-import com.hyunho9877.critic.service.interfaces.KafkaService;
+import com.hyunho9877.critic.utils.common.JwtExtractor;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -22,11 +27,13 @@ import java.util.NoSuchElementException;
 public class CriticController {
 
     private final CriticService criticService;
+    private final JwtExtractor jwtExtractor;
 
     @PostMapping("/apply")
-    public ResponseEntity<CriticDTO> applyCritic(@RequestBody CriticDTO criticDTO) {
+    public ResponseEntity<CriticDTO> applyCritic(@RequestBody CriticDTO criticDTO, Authentication authentication) {
         try {
-            CriticDTO applied = criticService.apply(criticDTO);
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            CriticDTO applied = criticService.apply(criticDTO, jwtExtractor.getStudNo(jwt), jwtExtractor.getDepartment(jwt));
             return ResponseEntity.ok(applied);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(criticDTO);
@@ -34,18 +41,20 @@ public class CriticController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<CriticDTO> deleteCritic(@RequestBody CriticDTO criticDTO) {
+    public ResponseEntity<CriticDTO> deleteCritic(@RequestBody CriticDTO criticDTO, Authentication authentication) {
         try {
-            return ResponseEntity.ok(criticService.delete(criticDTO));
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return ResponseEntity.ok(criticService.delete(criticDTO, jwtExtractor.getStudNo(jwt)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(criticDTO);
         }
     }
 
     @PostMapping("/update")
-    public ResponseEntity<CriticDTO> updateCritic(@RequestBody CriticDTO criticDTO) {
+    public ResponseEntity<CriticDTO> updateCritic(@RequestBody CriticDTO criticDTO, Authentication authentication) {
         try {
-            return ResponseEntity.ok(criticService.update(criticDTO));
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return ResponseEntity.ok(criticService.update(criticDTO, jwtExtractor.getStudNo(jwt)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(criticDTO);
         } catch (NoSuchElementException e) {
@@ -55,22 +64,22 @@ public class CriticController {
 
     @GetMapping("/recent")
     @CircuitBreaker(name = "critic-getRecentCircuitBreaker", fallbackMethod = "getFallback")
-    public List<Critic> getRecent() {
-        return criticService.getRecent();
+    public ResponseEntity<List<CriticDTO>> getRecent(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(criticService.getRecent(pageable));
     }
 
-    public List<Critic> getFallback(Throwable t) {
-        return Collections.emptyList();
+    public ResponseEntity<List<CriticDTO>> getFallback(Throwable t) {
+        return ResponseEntity.internalServerError().body(Collections.emptyList());
     }
 
     @PostMapping("/get")
     @CircuitBreaker(name = "critic-getCriticsCircuitBreaker", fallbackMethod = "getCriticsFallback")
-    public List<Critic> getCritics(@RequestBody CriticDTO criticDTO) {
-        return criticService.get(criticDTO.getLectureName(), criticDTO.getLectureProfessor());
+    public ResponseEntity<List<CriticDTO>> getCritics(@RequestBody CriticDTO criticDTO, @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(criticService.get(criticDTO.lectureName(), criticDTO.lectureProfessor(), pageable));
     }
 
-    public List<Critic> getCriticsFallback(@RequestBody CriticDTO criticDTO, Throwable throwable) {
-        return Collections.emptyList();
+    public ResponseEntity<List<Critic>> getCriticsFallback(@RequestBody CriticDTO criticDTO, Pageable pageable, Throwable throwable) {
+        return ResponseEntity.internalServerError().body(Collections.emptyList());
     }
 
 }

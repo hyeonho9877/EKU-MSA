@@ -1,15 +1,7 @@
 package com.hyunho9877.critic.dto;
 
 import com.hyunho9877.critic.domain.Grade;
-import lombok.Data;
 
-@Data
-public class CriticDTO {
-    private Long criticId;
-    private String writer;
-    private String content="";
-    private Grade grade;
-    private Float star;
-    private String lectureName;
-    private String lectureProfessor;
+public record CriticDTO(Long id, String writer, String content, Grade grade, Float star, String lectureName, String lectureProfessor) {
+
 }
