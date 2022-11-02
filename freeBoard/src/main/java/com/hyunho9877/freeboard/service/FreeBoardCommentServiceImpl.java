@@ -53,16 +53,19 @@ public class FreeBoardCommentServiceImpl implements FreeBoardCommentService {
     }
 
     @Override
-    public void delete(FreeBoardCommentDTO dto) throws InvalidDataAccessApiUsageException {
-        FreeBoard board = boardRepository.findById(dto.articleId()).orElseThrow();
-        commentRepository.deleteById(dto.id());
-        board.setComments(board.getComments()-1);
+    public void delete(FreeBoardCommentDTO dto, String writer) throws InvalidDataAccessApiUsageException {
+        FreeBoard article = boardRepository.findById(dto.articleId()).orElseThrow();
+        FreeBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        if(!comment.getWriter().equals(writer)) throw new IllegalStateException("user trying to delete comment which is not written by user");
+        commentRepository.delete(comment);
+        article.setComments(article.getComments()-1);
     }
 
     @Override
-    public FreeBoardCommentDTO update(FreeBoardCommentDTO dto) {
+    public FreeBoardCommentDTO update(FreeBoardCommentDTO dto, String writer) {
         validate(dto.comment());
         FreeBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        if(!comment.getWriter().equals(writer)) throw new IllegalStateException("user trying to update comment which is not written by user");
         comment.setComment(dto.comment());
         return dto;
     }

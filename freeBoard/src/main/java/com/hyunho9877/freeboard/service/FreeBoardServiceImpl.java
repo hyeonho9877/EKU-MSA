@@ -44,15 +44,18 @@ public class FreeBoardServiceImpl implements FreeBoardService {
     }
 
     @Override
-    public void delete(FreeBoardDTO dto) {
-        boardRepository.deleteById(dto.id());
+    public void delete(FreeBoardDTO dto, String writer) {
+        FreeBoard article = boardRepository.findById(dto.id()).orElseThrow();
+        if(!article.getWriter().equals(writer)) throw new IllegalStateException("user trying to delete article which is not written by user");
+        boardRepository.delete(article);
     }
 
     @Override
-    public FreeBoardDTO update(FreeBoardDTO dto) throws IllegalArgumentException{
+    public FreeBoardDTO update(FreeBoardDTO dto, String writer) throws IllegalArgumentException{
         validate(dto.building(), dto.content());
-        FreeBoard board = boardRepository.findById(dto.id()).orElseThrow();
-        board.setContent(dto.content());
+        FreeBoard article = boardRepository.findById(dto.id()).orElseThrow();
+        if(!article.getWriter().equals(writer)) throw new IllegalArgumentException("user trying to update article which is not written by user");
+        article.setContent(dto.content());
         return dto;
     }
 }

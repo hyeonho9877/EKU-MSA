@@ -37,9 +37,10 @@ public class FreeBoardCommentController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<?> delete(@RequestBody @Valid FreeBoardCommentDTO dto) {
+    public ResponseEntity<?> delete(@RequestBody @Valid FreeBoardCommentDTO dto, Authentication authentication) {
         try {
-            commentService.delete(dto);
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            commentService.delete(dto, jwtExtractor.getStudNo(jwt));
             return ResponseEntity.ok().build();
         } catch (InvalidDataAccessApiUsageException e) {
             return ResponseEntity.badRequest().body(dto);
@@ -47,9 +48,10 @@ public class FreeBoardCommentController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody @Valid FreeBoardCommentDTO dto) {
+    public ResponseEntity<?> update(@RequestBody @Valid FreeBoardCommentDTO dto, Authentication authentication) {
         try {
-            return ResponseEntity.ok(commentService.update(dto));
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return ResponseEntity.ok(commentService.update(dto, jwtExtractor.getStudNo(jwt)));
         } catch (InvalidDataAccessApiUsageException e) {
             return ResponseEntity.badRequest().body(dto);
         } catch (NoSuchElementException e) {

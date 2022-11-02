@@ -36,9 +36,10 @@ public class FreeBoardController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<?> delete(@RequestBody @Valid FreeBoardDTO dto) {
+    public ResponseEntity<?> delete(@RequestBody @Valid FreeBoardDTO dto, Authentication authentication) {
         try {
-            boardService.delete(dto);
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            boardService.delete(dto, jwtExtractor.getStudNo(jwt));
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
@@ -46,9 +47,10 @@ public class FreeBoardController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody @Valid FreeBoardDTO dto) {
+    public ResponseEntity<?> update(@RequestBody @Valid FreeBoardDTO dto, Authentication authentication) {
         try {
-            return ResponseEntity.ok(boardService.update(dto));
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return ResponseEntity.ok(boardService.update(dto, jwtExtractor.getStudNo(jwt)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
         } catch (EntityNotFoundException e) {

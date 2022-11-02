@@ -79,7 +79,7 @@ class FreeBoardServiceTest {
     @DirtiesContext
     void delete_basic() {
         FreeBoardDTO freeBoardDTO = new FreeBoardDTO(10001L, null, null, null, null);
-        freeBoardService.delete(freeBoardDTO);
+        freeBoardService.delete(freeBoardDTO, "201713883");
         assertEquals(3, boardRepository.findAll().size());
     }
 
@@ -87,21 +87,28 @@ class FreeBoardServiceTest {
     @DirtiesContext
     void delete_no_id() {
         FreeBoardDTO freeBoardDTO = new FreeBoardDTO(null, null, null, null, null);
-        assertThrows(RuntimeException.class, () -> freeBoardService.delete(freeBoardDTO));
+        assertThrows(RuntimeException.class, () -> freeBoardService.delete(freeBoardDTO, "201713883"));
     }
 
     @Test
     @DirtiesContext
     void delete_non_exists_id() {
         FreeBoardDTO freeBoardDTO = new FreeBoardDTO(99999L, null, null, null, null);
-        assertThrows(EmptyResultDataAccessException.class, () -> freeBoardService.delete(freeBoardDTO));
+        assertThrows(EmptyResultDataAccessException.class, () -> freeBoardService.delete(freeBoardDTO, "201713883"));
+    }
+
+    @Test
+    @DirtiesContext
+    void delete_with_no_authorization() {
+        FreeBoardDTO freeBoardDTO = new FreeBoardDTO(10001L, null, null, null, null);
+        assertThrows(IllegalStateException.class, () -> freeBoardService.delete(freeBoardDTO, "202113883"));
     }
 
     @Test
     @DirtiesContext
     void update_content() {
         FreeBoardDTO dto = new FreeBoardDTO(10001L, "201713883", "updated", 0, "00010");
-        freeBoardService.update(dto);
+        freeBoardService.update(dto, "201713883");
         FreeBoard freeBoard = boardRepository.findById(10001L).orElseThrow();
         assertEquals(dto.content(), freeBoard.getContent());
     }
@@ -109,12 +116,19 @@ class FreeBoardServiceTest {
     @Test
     void update_empty_content() {
         FreeBoardDTO dto = new FreeBoardDTO(10001L, "201713883", "", 0, "00010");
-        assertThrows(IllegalArgumentException.class, () -> freeBoardService.update(dto));
+        assertThrows(IllegalArgumentException.class, () -> freeBoardService.update(dto, "201713883"));
     }
 
     @Test
     void update_null_content() {
         FreeBoardDTO dto = new FreeBoardDTO(10001L, "201713883", null, 0, "00010");
-        assertThrows(IllegalArgumentException.class, () -> freeBoardService.update(dto));
+        assertThrows(IllegalArgumentException.class, () -> freeBoardService.update(dto, "201713883"));
+    }
+
+    @Test
+    @DirtiesContext
+    void update_with_no_authorization() {
+        FreeBoardDTO freeBoardDTO = new FreeBoardDTO(10001L, null, "updated", null, null);
+        assertThrows(IllegalStateException.class, () -> freeBoardService.update(freeBoardDTO, "202113883"));
     }
 }
