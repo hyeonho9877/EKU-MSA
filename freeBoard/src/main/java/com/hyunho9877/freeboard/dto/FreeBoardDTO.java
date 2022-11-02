@@ -1,18 +1,10 @@
 package com.hyunho9877.freeboard.dto;
 
-import com.hyunho9877.freeboard.utils.validator.number_only.NumberFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.hyunho9877.freeboard.utils.validator.number_only.NumberFormatValidator;
 
-@Data
-@NoArgsConstructor @AllArgsConstructor
-public class FreeBoardDTO {
-    private Long id;
-    @NumberFormat
-    private String writer;
-    private String content;
-    private Integer comments;
-    @NumberFormat
-    private String building;
+public record FreeBoardDTO(Long id, String writer, String content, Integer comments, String building) {
+    public FreeBoardDTO {
+        if(!NumberFormatValidator.isValid(building))
+            throw new IllegalArgumentException("building must contain only number");
+    }
 }

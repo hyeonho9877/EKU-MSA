@@ -6,6 +6,7 @@ import com.hyunho9877.freeboard.dto.FreeBoardCommentDTO;
 import com.hyunho9877.freeboard.repository.FreeBoardCommentRepository;
 import com.hyunho9877.freeboard.repository.FreeBoardRepository;
 import com.hyunho9877.freeboard.service.interfaces.FreeBoardCommentService;
+import com.hyunho9877.freeboard.utils.common.WriterGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
@@ -23,21 +24,25 @@ public class FreeBoardCommentServiceImpl implements FreeBoardCommentService {
 
     private final FreeBoardRepository boardRepository;
     private final FreeBoardCommentRepository commentRepository;
+    private final WriterGenerator writerGenerator;
 
     @Override
-    public List<FreeBoardComment> recent(Long articleID) throws IllegalArgumentException {
+    public List<FreeBoardCommentDTO> recent(Long articleID) throws IllegalArgumentException {
         if(articleID == null) throw new IllegalArgumentException("articleID must not be null");
         FreeBoard board = boardRepository.getArticleWithComments(articleID);
-        return board.getCommentList();
+        return board.getCommentList().stream()
+                .map(comment -> new FreeBoardCommentDTO(comment.getId(), writerGenerator.generate(comment.getWriter(), comment.getDept()), comment.getComment(), null))
+                .toList();
     }
 
     @Override
-    public FreeBoardCommentDTO apply(FreeBoardCommentDTO dto) throws IllegalArgumentException, InvalidDataAccessApiUsageException{
-        validate(dto.getWriter(), dto.getComment());
-        FreeBoard board = boardRepository.findById(dto.getArticleID()).orElseThrow();
+    public FreeBoardCommentDTO apply(FreeBoardCommentDTO dto, String studNo, String dept) throws IllegalArgumentException, InvalidDataAccessApiUsageException{
+        validate(dto.comment());
+        FreeBoard board = boardRepository.findById(dto.articleId()).orElseThrow();
         FreeBoardComment build = FreeBoardComment.builder()
-                .writer(dto.getWriter())
-                .comment(dto.getComment())
+                .writer(studNo)
+                .dept(dept)
+                .comment(dto.comment())
                 .article(board)
                 .disabled(false)
                 .build();
@@ -48,17 +53,20 @@ public class FreeBoardCommentServiceImpl implements FreeBoardCommentService {
     }
 
     @Override
-    public void delete(FreeBoardCommentDTO dto) throws InvalidDataAccessApiUsageException {
-        FreeBoard board = boardRepository.findById(dto.getArticleID()).orElseThrow();
-        commentRepository.deleteById(dto.getId());
-        board.setComments(board.getComments()-1);
+    public void delete(FreeBoardCommentDTO dto, String writer) throws InvalidDataAccessApiUsageException {
+        FreeBoard article = boardRepository.findById(dto.articleId()).orElseThrow();
+        FreeBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        if(!comment.getWriter().equals(writer)) throw new IllegalStateException("user trying to delete comment which is not written by user");
+        commentRepository.delete(comment);
+        article.setComments(article.getComments()-1);
     }
 
     @Override
-    public FreeBoardCommentDTO update(FreeBoardCommentDTO dto) {
-        validate(dto.getComment(), dto.getWriter());
-        FreeBoardComment comment = commentRepository.findById(dto.getId()).orElseThrow();
-        comment.setComment(dto.getComment());
+    public FreeBoardCommentDTO update(FreeBoardCommentDTO dto, String writer) {
+        validate(dto.comment());
+        FreeBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        if(!comment.getWriter().equals(writer)) throw new IllegalStateException("user trying to update comment which is not written by user");
+        comment.setComment(dto.comment());
         return dto;
     }
 }
