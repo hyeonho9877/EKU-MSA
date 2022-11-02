@@ -6,6 +6,7 @@ import com.hyunho9877.freeboard.dto.FreeBoardCommentDTO;
 import com.hyunho9877.freeboard.repository.FreeBoardCommentRepository;
 import com.hyunho9877.freeboard.repository.FreeBoardRepository;
 import com.hyunho9877.freeboard.service.interfaces.FreeBoardCommentService;
+import com.hyunho9877.freeboard.utils.common.WriterGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
@@ -23,20 +24,24 @@ public class FreeBoardCommentServiceImpl implements FreeBoardCommentService {
 
     private final FreeBoardRepository boardRepository;
     private final FreeBoardCommentRepository commentRepository;
+    private final WriterGenerator writerGenerator;
 
     @Override
-    public List<FreeBoardComment> recent(Long articleID) throws IllegalArgumentException {
+    public List<FreeBoardCommentDTO> recent(Long articleID) throws IllegalArgumentException {
         if(articleID == null) throw new IllegalArgumentException("articleID must not be null");
         FreeBoard board = boardRepository.getArticleWithComments(articleID);
-        return board.getCommentList();
+        return board.getCommentList().stream()
+                .map(comment -> new FreeBoardCommentDTO(comment.getId(), writerGenerator.generate(comment.getWriter(), comment.getDept()), comment.getComment(), null))
+                .toList();
     }
 
     @Override
-    public FreeBoardCommentDTO apply(FreeBoardCommentDTO dto) throws IllegalArgumentException, InvalidDataAccessApiUsageException{
+    public FreeBoardCommentDTO apply(FreeBoardCommentDTO dto, String studNo, String dept) throws IllegalArgumentException, InvalidDataAccessApiUsageException{
         validate(dto.comment());
         FreeBoard board = boardRepository.findById(dto.articleId()).orElseThrow();
         FreeBoardComment build = FreeBoardComment.builder()
-                .writer(dto.getWriter())
+                .writer(studNo)
+                .dept(dept)
                 .comment(dto.comment())
                 .article(board)
                 .disabled(false)

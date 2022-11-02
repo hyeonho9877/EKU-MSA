@@ -4,6 +4,7 @@ import com.hyunho9877.freeboard.domain.FreeBoard;
 import com.hyunho9877.freeboard.dto.FreeBoardDTO;
 import com.hyunho9877.freeboard.repository.FreeBoardRepository;
 import com.hyunho9877.freeboard.service.interfaces.FreeBoardService;
+import com.hyunho9877.freeboard.utils.common.WriterGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,20 +19,24 @@ import static com.hyunho9877.freeboard.utils.validator.empty_content.EmptyConten
 public class FreeBoardServiceImpl implements FreeBoardService {
 
     private final FreeBoardRepository boardRepository;
+    private final WriterGenerator writerGenerator;
 
     @Override
-    public List<FreeBoard> recent(String building) throws IllegalArgumentException{
+    public List<FreeBoardDTO> recent(String building) throws IllegalArgumentException{
         validate(building);
-        return boardRepository.findByBuildingOrderByIdDesc(building);
+        return boardRepository.findByBuildingOrderByIdDesc(building).stream()
+                .map(freeBoard -> new FreeBoardDTO(freeBoard.getId(), writerGenerator.generate(freeBoard.getWriter(), freeBoard.getDept()), freeBoard.getContent(), freeBoard.getComments(), freeBoard.getBuilding()))
+                .toList();
     }
 
     @Override
-    public FreeBoardDTO apply(FreeBoardDTO dto) throws IllegalArgumentException {
-        validate(dto.getWriter(), dto.getBuilding(), dto.getContent());
+    public FreeBoardDTO apply(FreeBoardDTO dto, String studNo, String dept) throws IllegalArgumentException {
+        validate(dto.building(), dto.content());
         FreeBoard board = FreeBoard.builder()
-                .content(dto.getContent())
-                .writer(dto.getWriter())
-                .building(dto.getBuilding())
+                .content(dto.content())
+                .writer(studNo)
+                .dept(dept)
+                .building(dto.building())
                 .disabled(false)
                 .build();
         boardRepository.save(board);
@@ -40,14 +45,14 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 
     @Override
     public void delete(FreeBoardDTO dto) {
-        boardRepository.deleteById(dto.getId());
+        boardRepository.deleteById(dto.id());
     }
 
     @Override
     public FreeBoardDTO update(FreeBoardDTO dto) throws IllegalArgumentException{
-        validate(dto.getBuilding(), dto.getContent(), dto.getWriter());
-        FreeBoard board = boardRepository.findById(dto.getId()).orElseThrow();
-        board.setContent(dto.getContent());
+        validate(dto.building(), dto.content());
+        FreeBoard board = boardRepository.findById(dto.id()).orElseThrow();
+        board.setContent(dto.content());
         return dto;
     }
 }

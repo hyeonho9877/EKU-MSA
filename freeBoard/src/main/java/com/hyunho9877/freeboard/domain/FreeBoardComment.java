@@ -14,11 +14,16 @@ public class FreeBoardComment extends BaseTime{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String writer;
+    @Column(nullable = false)
+    private String dept;
     private String comment;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
     private FreeBoard article;
+
     private boolean disabled;
 }

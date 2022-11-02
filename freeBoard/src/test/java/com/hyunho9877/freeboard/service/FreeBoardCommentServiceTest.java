@@ -14,8 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class FreeBoardCommentServiceTest {
@@ -29,8 +28,8 @@ class FreeBoardCommentServiceTest {
     @Test
     @DirtiesContext
     void apply_basic() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, "201713883", "apply comment test", 10001L);
-        commentService.apply(dto);
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, null, "apply comment test", 10001L);
+        commentService.apply(dto, "201713883", "컴퓨터공학부");
         assertEquals(5, commentRepository.findAll().size());
     }
 
@@ -45,63 +44,58 @@ class FreeBoardCommentServiceTest {
     @Test
     @DirtiesContext
     void apply_no_comment() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, "201713883", null, 10001L);
-        assertThrows(IllegalArgumentException.class, () -> commentService.apply(dto));
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, null, null, 10001L);
+        assertThrows(IllegalArgumentException.class, () -> commentService.apply(dto, "201713883", "컴퓨터공학부"));
     }
 
     @Test
     @DirtiesContext
     void apply_no_articleID() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, "201713883", "apply comment test", null);
-        assertThrows(InvalidDataAccessApiUsageException.class, () -> commentService.apply(dto));
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, null, "apply comment test", null);
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> commentService.apply(dto, "201713883", "컴퓨터공학부"));
     }
 
     @Test
     @DirtiesContext
     void apply_empty_writer() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, "", "apply comment test", 10001L);
-        assertThrows(IllegalArgumentException.class, () -> commentService.apply(dto));
+        // INVALID CASE
+        /*FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, "", "apply comment test", 10001L);
+        assertThrows(IllegalArgumentException.class, () -> commentService.apply(dto,"201713883", "컴퓨터공학부"));*/
     }
 
     @Test
     @DirtiesContext
     void apply_empty_content() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, "201713883", "", 10001L);
-        assertThrows(IllegalArgumentException.class, () -> commentService.apply(dto));
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, null, "", 10001L);
+        assertThrows(IllegalArgumentException.class, () -> commentService.apply(dto, "201713883", "컴퓨터공학부"));
     }
 
     @Test
     @DirtiesContext
     void delete_basic() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO();
-        dto.setId(20001L);
-        dto.setArticleID(10001L);
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(20001L, null, null, 10001L);
         commentService.delete(dto);
-        assertEquals(3, commentRepository.findAll().size());
+        assertTrue(commentRepository.findById(20001L).orElseThrow().isDisabled());
     }
 
     @Test
     @DirtiesContext
     void delete_no_id() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO();
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(null, null, null, null);
         assertThrows(RuntimeException.class, () -> commentService.delete(dto));
     }
 
     @Test
     @DirtiesContext
     void delete_no_article_id() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO();
-        dto.setId(20001L);
-        dto.setArticleID(19999L);
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(20001L, null, null, 19999L);
         assertThrows(NoSuchElementException.class, () -> commentService.delete(dto));
     }
 
     @Test
     @DirtiesContext
     void delete_non_exists_id() {
-        FreeBoardCommentDTO dto = new FreeBoardCommentDTO();
-        dto.setId(99999L);
-        dto.setArticleID(10001L);
+        FreeBoardCommentDTO dto = new FreeBoardCommentDTO(99999L, null, null, 10001L);
         assertThrows(EmptyResultDataAccessException.class, () -> commentService.delete(dto));
     }
 
@@ -111,7 +105,7 @@ class FreeBoardCommentServiceTest {
         FreeBoardCommentDTO dto = new FreeBoardCommentDTO(20001L, "201713883", "updated", 10001L);
         commentService.update(dto);
         FreeBoardComment comment = commentRepository.findById(20001L).orElseThrow();
-        assertEquals(dto.getComment(), comment.getComment());
+        assertEquals(dto.comment(), comment.getComment());
     }
 
     @Test
@@ -130,7 +124,7 @@ class FreeBoardCommentServiceTest {
 
     @Test
     void get_recent() {
-        List<FreeBoardComment> recent = commentService.recent(10004L);
+        List<FreeBoardCommentDTO> recent = commentService.recent(10004L);
         assertEquals(3, recent.size());
     }
 

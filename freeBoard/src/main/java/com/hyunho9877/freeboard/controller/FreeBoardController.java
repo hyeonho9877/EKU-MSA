@@ -2,11 +2,14 @@ package com.hyunho9877.freeboard.controller;
 
 import com.hyunho9877.freeboard.dto.FreeBoardDTO;
 import com.hyunho9877.freeboard.service.interfaces.FreeBoardService;
+import com.hyunho9877.freeboard.utils.common.JwtExtractor;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -20,11 +23,13 @@ import java.util.Collections;
 public class FreeBoardController {
 
     private final FreeBoardService boardService;
+    private final JwtExtractor jwtExtractor;
 
     @PostMapping("/apply")
-    public ResponseEntity<?> apply(@RequestBody @Valid FreeBoardDTO dto) {
+    public ResponseEntity<?> apply(@RequestBody @Valid FreeBoardDTO dto, Authentication authentication) {
         try {
-            return ResponseEntity.ok(boardService.apply(dto));
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return ResponseEntity.ok(boardService.apply(dto, jwtExtractor.getStudNo(jwt), jwtExtractor.getDepartment(jwt)));
         } catch (DataIntegrityViolationException | IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
         }

@@ -20,6 +20,8 @@ public class FreeBoard extends BaseTime {
     @Column(nullable = false)
     private String writer;
     @Column(nullable = false)
+    private String dept;
+    @Column(nullable = false)
     private String content;
     private Integer comments;
     @Column(nullable = false)
