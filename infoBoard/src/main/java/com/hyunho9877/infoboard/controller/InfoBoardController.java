@@ -32,7 +32,7 @@ public class InfoBoardController {
     public ResponseEntity<InfoBoardDto> apply(@RequestBody InfoBoardDto dto, Authentication authentication) {
         try {
             Jwt jwt = (Jwt) authentication.getPrincipal();
-            boardService.apply(dto, jwtExtractor.getStudNo(jwt), jwtExtractor.getStudNo(jwt));
+            boardService.apply(dto, jwtExtractor.getStudNo(jwt), jwtExtractor.getName(jwt));
             return ResponseEntity.ok(dto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
