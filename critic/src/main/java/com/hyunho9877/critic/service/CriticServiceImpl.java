@@ -5,10 +5,10 @@ import com.hyunho9877.critic.domain.Grade;
 import com.hyunho9877.critic.dto.CriticDTO;
 import com.hyunho9877.critic.repository.CriticRepository;
 import com.hyunho9877.critic.service.interfaces.CriticService;
+import com.hyunho9877.critic.utils.common.WriterGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,23 +17,24 @@ import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CriticServiceImpl implements CriticService {
 
     private final CriticRepository criticRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final WriterGenerator writerGenerator;
 
     @Override
-
-    public CriticDTO apply(CriticDTO criticDTO) {
+    public CriticDTO apply(CriticDTO criticDTO, String studNo, String dept) {
 
         Critic critic = Critic.builder()
-                .content(criticDTO.getContent())
-                .grade(criticDTO.getGrade())
-                .star(criticDTO.getStar())
-                .lectureName(criticDTO.getLectureName())
-                .lectureProfessor(criticDTO.getLectureProfessor())
-                .writer(criticDTO.getWriter())
+                .content(criticDTO.content())
+                .grade(criticDTO.grade())
+                .star(criticDTO.star())
+                .lectureName(criticDTO.lectureName())
+                .lectureProfessor(criticDTO.lectureProfessor())
+                .writer(studNo)
+                .dept(dept)
                 .build();
 
         criticRepository.save(critic);
@@ -42,36 +43,46 @@ public class CriticServiceImpl implements CriticService {
     }
 
     @Override
-    public CriticDTO delete(CriticDTO criticDTO) {
-        criticRepository.deleteById(criticDTO.getCriticId());
+    public CriticDTO delete(CriticDTO criticDTO, String writer) {
+        Critic critic = criticRepository.findById(criticDTO.id()).orElseThrow();
+        if(!critic.getWriter().equals(writer))
+            throw new IllegalStateException("user trying to delete critic which is not written by user");
+        criticRepository.delete(critic);
         return criticDTO;
     }
 
     @Override
-    @Transactional
-    public CriticDTO update(CriticDTO criticDTO) throws NoSuchElementException {
-        Critic critic = criticRepository.findById(criticDTO.getCriticId()).orElseThrow();
+    public CriticDTO update(CriticDTO criticDTO, String writer) throws NoSuchElementException {
+        Critic critic = criticRepository.findById(criticDTO.id()).orElseThrow();
+        if(!critic.getWriter().equals(writer))
+            throw new IllegalStateException("user trying to update article which is not written by user");
 
-        String content = criticDTO.getContent();
-        if(!content.isEmpty()) critic.setContent(content);
+        String content = criticDTO.content();
+        if (!content.isEmpty()) critic.setContent(content);
 
-        Grade grade = criticDTO.getGrade();
-        if(!(grade == null)) critic.setGrade(grade);
+        Grade grade = criticDTO.grade();
+        if (!(grade == null)) critic.setGrade(grade);
 
-        Float star = criticDTO.getStar();
-        if(!(star==null)) critic.setStar(star);
+        Float star = criticDTO.star();
+        if (!(star == null)) critic.setStar(star);
 
         return criticDTO;
     }
 
 
     @Override
-    public List<Critic> getRecent() {
-        return criticRepository.findByOrderByCriticIdDesc(Pageable.ofSize(10));
+    public List<CriticDTO> getRecent(Pageable pageable) {
+        return criticRepository.findByOrderByCriticIdDesc(pageable)
+                .stream()
+                .map(critic -> new CriticDTO(critic.getId(), writerGenerator.generate(critic.getWriter(), critic.getDept()), critic.getContent(), critic.getGrade(), critic.getStar(), critic.getLectureName(), critic.getLectureProfessor()))
+                .toList();
     }
 
     @Override
-    public List<Critic> get(String lectureName, String lectureProfessor) {
-        return criticRepository.findByLectureNameAndLectureProfessor(lectureName, lectureProfessor);
+    public List<CriticDTO> get(String lectureName, String lectureProfessor, Pageable pageable) {
+        return criticRepository.findByLectureNameAndLectureProfessor(lectureName, lectureProfessor, pageable)
+                .stream()
+                .map(critic -> new CriticDTO(critic.getId(), writerGenerator.generate(critic.getWriter(), critic.getDept()), critic.getContent(), critic.getGrade(), critic.getStar(), critic.getLectureName(), critic.getLectureProfessor()))
+                .toList();
     }
 }

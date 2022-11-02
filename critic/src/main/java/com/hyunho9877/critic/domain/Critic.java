@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Critic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long criticId;
+    private Long id;
     @Column(nullable = false)
     private String content;
     @Column(nullable = false)
@@ -24,6 +24,8 @@ public class Critic {
     private Float star;
     @Column(nullable = false)
     private String writer;
+    @Column(nullable = false)
+    private String dept;
     @Column(nullable = false)
     private String lectureName;
     @Column(nullable = false)
