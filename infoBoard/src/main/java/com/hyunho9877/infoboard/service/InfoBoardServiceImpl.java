@@ -22,17 +22,20 @@ public class InfoBoardServiceImpl implements InfoBoardService {
     private final WriterGenerator writerGenerator;
 
     @Override
-    public List<InfoBoard> recent(String building) {
+    public List<InfoBoardDto> recent(String building) {
         validate(building);
-        return boardRepository.findByBuilding(building);
+        return boardRepository.findByBuilding(building).stream()
+                .map(article -> new InfoBoardDto(article.getId(), article.getBuilding(), article.getContent(), article.getComments(), writerGenerator.generate(article.getWriter(), article.getDept())))
+                .toList();
     }
 
     @Override
-    public void apply(InfoBoardDto dto, String studNo, String name) {
+    public void apply(InfoBoardDto dto, String studNo, String dept) {
         validate(dto.content(), dto.building());
 
         InfoBoard article = InfoBoard.builder()
-                .writer(writerGenerator.generate(studNo, name))
+                .writer(studNo)
+                .dept(dept)
                 .content(dto.content())
                 .building(dto.building())
                 .build();
@@ -41,15 +44,20 @@ public class InfoBoardServiceImpl implements InfoBoardService {
     }
 
     @Override
-    public void delete(InfoBoardDto dto) {
+    public void delete(InfoBoardDto dto, String writer) {
         validate(dto.building());
-        boardRepository.deleteById(dto.id());
+        InfoBoard article = boardRepository.findById(dto.id()).orElseThrow();
+        if(!article.getWriter().equals(writer))
+            throw new IllegalStateException("user trying to delete article which is not written by user");
+        boardRepository.delete(article);
     }
 
     @Override
-    public void update(InfoBoardDto dto) {
+    public void update(InfoBoardDto dto, String writer) {
         validate(dto.building(), dto.content());
         InfoBoard article = boardRepository.findById(dto.id()).orElseThrow();
+        if(!article.getWriter().equals(writer))
+            throw new IllegalStateException("user trying to update article which is not written by user");
         article.setContent(dto.content());
     }
 }

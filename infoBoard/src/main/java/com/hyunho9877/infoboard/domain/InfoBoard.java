@@ -13,9 +13,15 @@ public class InfoBoard extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String writer;
+    @Column(nullable = false)
+    private String dept;
+    @Column(nullable = false)
     private String building;
+    @Column(nullable = false)
     private String content;
+    @Column(nullable = false)
     private long comments;
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @JsonIgnore @ToString.Exclude
