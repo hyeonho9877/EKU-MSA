@@ -33,11 +33,11 @@ public class FreeBoardCommentServiceImpl implements FreeBoardCommentService {
 
     @Override
     public FreeBoardCommentDTO apply(FreeBoardCommentDTO dto) throws IllegalArgumentException, InvalidDataAccessApiUsageException{
-        validate(dto.getWriter(), dto.getComment());
-        FreeBoard board = boardRepository.findById(dto.getArticleID()).orElseThrow();
+        validate(dto.comment());
+        FreeBoard board = boardRepository.findById(dto.articleId()).orElseThrow();
         FreeBoardComment build = FreeBoardComment.builder()
                 .writer(dto.getWriter())
-                .comment(dto.getComment())
+                .comment(dto.comment())
                 .article(board)
                 .disabled(false)
                 .build();
@@ -49,16 +49,16 @@ public class FreeBoardCommentServiceImpl implements FreeBoardCommentService {
 
     @Override
     public void delete(FreeBoardCommentDTO dto) throws InvalidDataAccessApiUsageException {
-        FreeBoard board = boardRepository.findById(dto.getArticleID()).orElseThrow();
-        commentRepository.deleteById(dto.getId());
+        FreeBoard board = boardRepository.findById(dto.articleId()).orElseThrow();
+        commentRepository.deleteById(dto.id());
         board.setComments(board.getComments()-1);
     }
 
     @Override
     public FreeBoardCommentDTO update(FreeBoardCommentDTO dto) {
-        validate(dto.getComment(), dto.getWriter());
-        FreeBoardComment comment = commentRepository.findById(dto.getId()).orElseThrow();
-        comment.setComment(dto.getComment());
+        validate(dto.comment());
+        FreeBoardComment comment = commentRepository.findById(dto.id()).orElseThrow();
+        comment.setComment(dto.comment());
         return dto;
     }
 }

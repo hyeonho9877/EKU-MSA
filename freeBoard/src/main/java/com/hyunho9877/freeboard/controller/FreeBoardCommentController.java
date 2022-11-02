@@ -56,7 +56,7 @@ public class FreeBoardCommentController {
     @CircuitBreaker(name = "freeBoard-recentCircuitBreaker", fallbackMethod = "boardRecentFallback")
     public ResponseEntity<?> recent(@RequestBody @Valid FreeBoardCommentDTO dto) {
         try {
-            return ResponseEntity.ok(commentService.recent(dto.getArticleID()));
+            return ResponseEntity.ok(commentService.recent(dto.articleId()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(dto);
         }
