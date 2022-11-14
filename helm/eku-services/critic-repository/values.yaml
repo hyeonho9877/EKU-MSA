@@ -1,0 +1,28 @@
+deploymentName: critic-repository-deployment
+deploymentLabel: critic-repository
+
+replicaCount: 1
+
+image:
+  repository: mysql
+  tag: 8.0.29
+
+containerPort: 3307
+
+service:
+  type: ClusterIP
+  port: 3307
+  targetPort: 3306
+
+config_enabled: false
+zipkin_enabled: false
+profile_enabled: false
+application_name_enabled: false
+encrypt_enabled: false
+is_database: true
+
+root_password: rootpassword1234
+db_name: critic
+db_username: critic
+db_password: criticPassword1234
+db_tcp_port: "3307"

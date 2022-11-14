@@ -1,0 +1,28 @@
+deploymentName: infoboard-repository-deployment
+deploymentLabel: infoboard-repository
+
+replicaCount: 1
+
+image:
+  repository: mysql
+  tag: 8.0.29
+
+containerPort: 3310
+
+service:
+  type: ClusterIP
+  port: 3310
+  targetPort: 3310
+
+config_enabled: false
+zipkin_enabled: false
+profile_enabled: false
+application_name_enabled: false
+encrypt_enabled: false
+is_database: true
+
+root_password: rootpassword1234
+database: infoboard
+user: infoboard
+password: infoboardPassword1234
+tcp_port: 3310
