@@ -1,0 +1,24 @@
+deploymentName: infoboard-deployment
+deploymentLabel: infoboard
+
+replicaCount: 1
+
+image:
+  repository: ruldarm00/eku-infoboard
+  tag: latest
+
+containerPort: 8083
+
+service:
+  type: ClusterIP
+  port: 8083
+  targetPort: 8080
+
+config_enabled: true
+zipkin_enabled: true
+profile_enabled: true
+application_name_enabled: true
+encrypt_enabled: false
+is_database: false
+
+application_name: infoboard
