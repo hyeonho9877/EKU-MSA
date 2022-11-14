@@ -1,0 +1,24 @@
+deploymentName: doodle-deployment
+deploymentLabel: doodle
+
+replicaCount: 1
+
+image:
+  repository: ruldarm00/eku-doodle
+  tag: latest
+
+containerPort: 8081
+
+service:
+  type: ClusterIP
+  port: 8081
+  targetPort: 8080
+
+config_enabled: true
+zipkin_enabled: true
+profile_enabled: true
+application_name_enabled: true
+encrypt_enabled: false
+is_database: false
+
+application_name: doodle

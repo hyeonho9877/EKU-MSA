@@ -1,0 +1,5 @@
+global:
+  configMapName: eku-stg-configmap
+  activeProfile: stg
+  configServerURL: configserver:http://configserver:8071
+  zipkinBaseURL: http://zipkin:9411/

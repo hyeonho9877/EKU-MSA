@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "keycloak-feign-client", url = "http://keycloak:8073/", configuration = FeignConfig.class)
+@FeignClient(name = "keycloak-feign-client", url = "http://keycloak/", configuration = FeignConfig.class)
 public interface KeyCloakFeignClient {
     @PostMapping(value = "/admin/realms/eku/users", consumes = MediaType.APPLICATION_JSON_VALUE)
     void registerUser(@RequestBody KeyCloakUserDto userRepresentation);

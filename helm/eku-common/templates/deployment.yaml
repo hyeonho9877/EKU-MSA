@@ -1,0 +1,66 @@
+{{- define "common.deployment" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deploymentName }}
+  labels:
+    app: {{ .Values.deploymentLabel }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deploymentLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deploymentLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.deploymentLabel }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+          env:
+        {{- if .Values.profile_enabled }}
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.global.configMapName }}
+                  key: SPRING_PROFILES_ACTIVE
+        {{- end }}
+        {{- if .Values.application_name_enabled }}
+            - name: SPRING_APPLICATION_NAME
+              value: {{ .Values.application_name}}
+        {{- end }}
+        {{- if .Values.zipkin_enabled }}
+            - name: SPRING_ZIPKIN_BASEURL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.global.configMapName }}
+                  key: SPRING_ZIPKIN_BASEURL
+        {{- end }}
+        {{- if .Values.config_enabled }}
+            - name: SPRING_CONFIG_IMPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.global.configMapName }}
+                  key: SPRING_CONFIG_IMPORT
+        {{- end }}
+        {{- if .Values.encrypt_enabled }}
+            - name: ENCRYPT_KEY
+              value: {{ .Values.encrypt_key }}
+        {{- end }}
+        {{- if .Values.is_database }}
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.root_password }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.db_name }}
+            - name: MYSQL_USER
+              value: {{ .Values.db_username }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.db_password }}
+#            - name: MYSQL_TCP_PORT
+#              value: {{ .Values.db_tcp_port }}
+        {{- end }}
+{{- end -}}

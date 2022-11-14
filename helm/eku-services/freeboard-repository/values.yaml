@@ -1,0 +1,28 @@
+deploymentName: freeboard-repository-deployment
+deploymentLabel: freeboard-repository
+
+replicaCount: 1
+
+image:
+  repository: mysql
+  tag: 8.0.29
+
+containerPort: 3309
+
+service:
+  type: ClusterIP
+  port: 3309
+  targetPort: 3309
+
+config_enabled: false
+zipkin_enabled: false
+profile_enabled: false
+application_name_enabled: false
+encrypt_enabled: false
+is_database: true
+
+root_password: rootpassword1234
+database: freeboard
+user: freeboard
+password: freeboardPassword1234
+tcp_port: 3309
